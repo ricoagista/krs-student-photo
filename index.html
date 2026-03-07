@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cek Foto Mahasiswa UMM</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600&display=swap" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body class="min-h-screen flex items-center justify-center p-5 text-slate-100">
+
+    <div class="glass-card w-full max-w-4xl grid md:grid-cols-2 gap-8 p-8 rounded-3xl">
+        <div class="flex flex-col gap-6">
+            <div class="flex items-start justify-between">
+                <div>
+                    <h1 class="text-3xl md:text-4xl font-semibold leading-tight mt-2">Cari Foto Mahasiswa</h1>
+                    <p class="text-sm text-slate-400 mt-2">Masukkan tahun angkatan dan NIM untuk menampilkan foto resmi.</p>
+                </div>
+            </div>
+
+            <div class="space-y-4">
+                <label class="block">
+                    <span class="text-sm text-slate-300">Tahun Angkatan</span>
+                    <input type="number" id="tahun" placeholder="Contoh: 2024" class="mt-2 w-full px-4 py-3 rounded-xl bg-slate-900/60 border border-slate-700 text-slate-100 focus:border-[var(--accent)] focus:ring-2 focus:ring-[var(--accent)]/40 transition" />
+                </label>
+
+                <label class="block">
+                    <span class="text-sm text-slate-300">NIM Mahasiswa</span>
+                    <input type="text" id="nim" placeholder="Contoh: 202410370110xxx" class="mt-2 w-full px-4 py-3 rounded-xl bg-slate-900/60 border border-slate-700 text-slate-100 focus:border-[var(--accent)] focus:ring-2 focus:ring-[var(--accent)]/40 transition" />
+                </label>
+            </div>
+
+            <div class="flex flex-col sm:flex-row gap-3">
+                <button id="tampil-btn" class="relative w-full sm:w-auto px-6 py-3.5 rounded-xl bg-[var(--accent)] hover:bg-rose-700 active:translate-y-[1px] font-semibold shadow-[0_12px_40px_rgba(225,29,72,0.35)] transition" onclick="muatFoto()">
+                    <span>Tampilkan Foto</span>
+                </button>
+                <a id="download-btn" class="w-full sm:w-auto px-6 py-3.5 rounded-xl border border-slate-600 text-slate-200 font-semibold text-center cursor-not-allowed opacity-50 transition" aria-disabled="true">Download</a>
+            </div>
+
+            <div id="status-message" class="hidden text-sm rounded-xl px-4 py-3"></div>
+        </div>
+
+        <div class="relative">
+            <div id="container" class="image-frame relative overflow-hidden">
+                <div id="loading-layer" class="hidden absolute inset-0 bg-slate-900/50 backdrop-blur-sm flex items-center justify-center">
+                    <div class="relative w-12 h-12 rounded-full border-2 border-slate-600 border-t-[var(--accent)] animate-spin"></div>
+                </div>
+                <p id="placeholder-text" class="text-center text-slate-400 px-6 leading-relaxed">Foto akan muncul di sini. Pastikan tahun dan NIM sesuai data KRS.</p>
+                <img id="foto-mahasiswa" src="" alt="Foto Mahasiswa" class="img-display">
+            </div>
+        </div>
+    </div>
+
+    <script src="script.js" defer></script>
+</body>
+</html>
