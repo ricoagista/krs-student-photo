@@ -6,7 +6,11 @@ const statusMsg = document.getElementById('status-message');
 const container = document.getElementById('container');
 const loadingLayer = document.getElementById('loading-layer');
 const downloadBtn = document.getElementById('download-btn');
+const namaWrapper = document.getElementById('nama-wrapper');
+const namaText = document.getElementById('nama-text');
+const namaStatus = document.getElementById('nama-status');
 let currentRequest = '';
+let namaRequestId = 0;
 
 function muatFoto() {
     const tahun = tahunInput.value.trim();
@@ -23,6 +27,9 @@ function muatFoto() {
     placeholder.style.display = 'block';
     container.style.borderStyle = 'dashed';
     resetDownload();
+    setNamaLoading();
+    namaRequestId += 1;
+    fetchNama(nim, namaRequestId);
 
     const url = `https://krs.umm.ac.id/Poto/${tahun}/${nim}.JPG`;
     currentRequest = url;
@@ -78,6 +85,45 @@ function enableDownload(url, filename) {
     downloadBtn.classList.remove('cursor-not-allowed', 'opacity-50');
     downloadBtn.classList.add('hover:border-[var(--accent)]', 'hover:text-white');
     downloadBtn.setAttribute('aria-disabled', 'false');
+}
+
+function setNamaLoading() {
+    namaWrapper.classList.remove('hidden');
+    namaText.textContent = '';
+    namaStatus.textContent = 'Memuat nama...';
+    namaStatus.className = 'text-sm text-slate-300 mt-1';
+}
+
+function tampilkanNama(nama) {
+    namaWrapper.classList.remove('hidden');
+    namaText.textContent = nama;
+    namaStatus.textContent = '';
+    namaStatus.className = 'text-sm text-slate-300 mt-1';
+}
+
+function tampilkanNamaError(text) {
+    namaWrapper.classList.remove('hidden');
+    namaText.textContent = '';
+    namaStatus.textContent = text;
+    namaStatus.className = 'text-sm text-rose-200 mt-1';
+}
+
+async function fetchNama(nim, requestId) {
+    try {
+        const res = await fetch(`https://mkwk.org/rekapan/zoom-gmeet/cek.php?nim=${encodeURIComponent(nim)}`, { cache: 'no-store' });
+        if (requestId !== namaRequestId) return;
+        if (!res.ok) throw new Error('Response error');
+
+        const data = await res.json();
+        const nama = data?.data?.nama?.trim();
+
+        if (data?.status !== 'ok' || !nama) throw new Error('Nama tidak ditemukan');
+
+        tampilkanNama(nama);
+    } catch (err) {
+        if (requestId !== namaRequestId) return;
+        tampilkanNamaError('Nama tidak ditemukan.');
+    }
 }
 
 [tahunInput, nimInput].forEach(el => {

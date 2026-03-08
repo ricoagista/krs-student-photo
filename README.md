@@ -26,6 +26,7 @@ Halaman web statis untuk menampilkan foto mahasiswa UMM berdasar tahun angkatan 
 - Input angkatan & NIM, fetch langsung ke server KRS UMM
 - Status feedback: loading, sukses, gagal
 - Tombol unduh aktif otomatis setelah foto dimuat
+- Ambil nama mahasiswa via API mkwk.org dan tampilkan berdampingan dengan foto
 
 ---
 
@@ -42,7 +43,9 @@ cd krs-student-photo-viewer
 
 ## ⚠️ Catatan Penting
 - Sumber data: `https://krs.umm.ac.id/Poto/<tahun>/<nim>.JPG`
+- Sumber nama: `https://mkwk.org/rekapan/zoom-gmeet/cek.php?nim=<nim>` (hanya nama yang diambil)
 - Jika foto tidak muncul, cek format tahun/NIM atau koneksi ke domain tersebut
+- Jika nama tidak muncul, API bisa sedang lambat/tidak tersedia; foto tetap dapat dicek
 - Murni client-side, tidak ada backend atau penyimpanan data
 
 ---
