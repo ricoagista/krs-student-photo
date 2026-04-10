@@ -108,18 +108,37 @@ function tampilkanNamaError(text) {
     namaStatus.className = 'text-sm text-rose-200 mt-1';
 }
 
+// Ganti dengan URL Cloudflare Pages/Workers Anda yang baru
+const PRIVATE_API_URL = 'https://api-mahasiswa-2024.ricoagista.workers.dev/api/cari';
+
 async function fetchNama(nim, requestId) {
+    setNamaLoading();
+    
     try {
-        const res = await fetch(`https://mkwk.org/rekapan/zoom-gmeet/cek.php?nim=${encodeURIComponent(nim)}`, { cache: 'no-store' });
+        // 1. Coba ambil data dari API Private (Cloudflare)
+        const response = await fetch(`${PRIVATE_API_URL}?nim=${encodeURIComponent(nim)}`);
+        const result = await response.json();
+
+        // Cek jika ada request baru yang masuk saat fetch sedang berjalan
         if (requestId !== namaRequestId) return;
-        if (!res.ok) throw new Error('Response error');
 
-        const data = await res.json();
-        const nama = data?.data?.nama?.trim();
-
-        if (data?.status !== 'ok' || !nama) throw new Error('Nama tidak ditemukan');
-
-        tampilkanNama(nama);
+        if (result.status === 'success') {
+            // Jika ketemu di data CSV (mahasiswa.json)
+            tampilkanNama(result.data.nama);
+            // Menampilkan jurusan di bawah nama
+            namaStatus.textContent = result.data.jurusan;
+            namaStatus.className = 'text-sm text-slate-300 mt-1';
+        } else {
+            // 2. Jika tidak ada di CSV, Fallback ke API mkwk.org
+            const resFallback = await fetch(`https://mkwk.org/rekapan/zoom-gmeet/cek.php?nim=${encodeURIComponent(nim)}`, { cache: 'no-store' });
+            const dataFallback = await resFallback.json();
+            
+            if (dataFallback?.status === 'ok' && dataFallback?.data?.nama) {
+                tampilkanNama(dataFallback.data.nama.trim());
+            } else {
+                throw new Error('Data tidak ditemukan di semua sumber');
+            }
+        }
     } catch (err) {
         if (requestId !== namaRequestId) return;
         tampilkanNamaError('Nama tidak ditemukan.');
