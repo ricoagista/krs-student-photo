@@ -115,24 +115,37 @@ async function fetchNama(nim, requestId) {
     setNamaLoading();
     
     try {
-        // 1. Coba ambil data dari API Private (Cloudflare)
-        const response = await fetch(`${PRIVATE_API_URL}?nim=${encodeURIComponent(nim)}`);
-        const result = await response.json();
+        let found = false;
 
-        // Cek jika ada request baru yang masuk saat fetch sedang berjalan
-        if (requestId !== namaRequestId) return;
+        try {
+            // 1. Coba ambil data dari API Private (Cloudflare)
+            const response = await fetch(`${PRIVATE_API_URL}?nim=${encodeURIComponent(nim)}`);
+            if (response.ok) {
+                const result = await response.json();
 
-        if (result.status === 'success') {
-            // Jika ketemu di data CSV (mahasiswa.json)
-            tampilkanNama(result.data.nama);
-            // Menampilkan jurusan di bawah nama
-            namaStatus.textContent = result.data.jurusan;
-            namaStatus.className = 'text-sm text-slate-300 mt-1';
-        } else {
-            // 2. Jika tidak ada di CSV, Fallback ke API mkwk.org
+                // Cek jika ada request baru yang masuk saat fetch sedang berjalan
+                if (requestId !== namaRequestId) return;
+
+                if (result.status === 'success') {
+                    // Jika ketemu di data CSV (mahasiswa.json)
+                    tampilkanNama(result.data.nama);
+                    // Menampilkan jurusan di bawah nama
+                    namaStatus.textContent = result.data.jurusan;
+                    namaStatus.className = 'text-sm text-slate-300 mt-1';
+                    found = true;
+                }
+            }
+        } catch (apiErr) {
+            console.warn('API Utama gagal, mencoba fallback:', apiErr);
+        }
+
+        if (!found) {
+            // 2. Jika tidak ada di CSV atau API gagal, Fallback ke API mkwk.org
             const resFallback = await fetch(`https://mkwk.org/rekapan/zoom-gmeet/cek.php?nim=${encodeURIComponent(nim)}`, { cache: 'no-store' });
             const dataFallback = await resFallback.json();
             
+            if (requestId !== namaRequestId) return;
+
             if (dataFallback?.status === 'ok' && dataFallback?.data?.nama) {
                 tampilkanNama(dataFallback.data.nama.trim());
             } else {
